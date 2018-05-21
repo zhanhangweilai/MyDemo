@@ -15,7 +15,7 @@ public class MyAdapter extends RecyclerView.Adapter {
     private ArrayList<String> mList;
     private String[] mArName;
     private Context mContext;
-
+    private OnItemClickListener mOnItemClickListener;
 
     public MyAdapter(Context context) {
         mContext = context;
@@ -24,6 +24,10 @@ public class MyAdapter extends RecyclerView.Adapter {
         for (String str : mArName) {
             mList.add(str);
         }
+    }
+
+    public void setOnItemClickListener (OnItemClickListener l) {
+        mOnItemClickListener = l;
     }
 
     @Override
@@ -53,15 +57,22 @@ public class MyAdapter extends RecyclerView.Adapter {
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.list_view, null);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.list_view, parent,false);
         MyHolder myHolder = new MyHolder(view);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mOnItemClickListener.onItemClick(v, (int)v.getTag());
+            }
+        });
         return myHolder;
     }
 
     @Override
-    public void onBindViewHolder(MyHolder holder, int position) {
-        holder.tv.setText(mList.get(position));
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        ((MyHolder)holder).tv.setText(mList.get(position));
+        holder.itemView.setTag(position);
 
     }
 
@@ -69,6 +80,12 @@ public class MyAdapter extends RecyclerView.Adapter {
     public int getItemCount() {
         return mList.size();
     }
+
+    public static interface OnItemClickListener {
+
+        void onItemClick(View view, int position);
+    }
+
 
     class MyHolder extends RecyclerView.ViewHolder{
         private TextView tv;
